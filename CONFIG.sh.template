@@ -1,0 +1,6 @@
+export TMPFILE=/tmp/convertfiles.txt
+export CORES=5
+export LQ_WIDTH=1440
+export LQ_HEIGHT=900
+export LQ_QUALITY=90
+export SSH_DEST='foo@example.com:~/imagesync'
