@@ -23,7 +23,7 @@ The folders are getting synced using this priority: lq_final, lq_raw, final, raw
 ## Usage
 
 ### Dependencies
-    sudo apt-get install rsync imagemagick
+    sudo apt-get install rsync imagemagick parallel
 
 ### Settings
     cp CONFIG.sh.template CONFIG.sh
