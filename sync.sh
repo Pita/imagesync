@@ -1,24 +1,25 @@
 #!/bin/bash
 source CONFIG.sh
 
-#make sure a lastrun file exits
-if [ ! -f '.lastrun' ]; then
-  touch -t 197001010000 .lastrun
-fi
+rm -rf $TMPFOLDER
+mkdir -p $TMPFOLDER
 
 echo "find new images..."
-find final -iregex '.*\.jpg' -newer .lastrun > $TMPFILE
-find raw   -iregex '.*\.jpg' -newer .lastrun >> $TMPFILE
+find final -iregex '.*\.jpg' > $TMPFOLDER/all_images.txt
+find raw   -iregex '.*\.jpg' >> $TMPFOLDER/all_images.txt
 
 echo "create folders for new images..."
-cat $TMPFILE | while read line
+touch $TMPFOLDER/new_images.txt
+cat $TMPFOLDER/all_images.txt | while read line
 do
-  mkdir -p $(dirname $(echo lq_"$line"))
+  if [ ! -f "lq_$line" ]; then    
+    mkdir -p "$(dirname "$(echo lq_"$line")")"
+    echo $line >> $TMPFOLDER/new_images.txt
+  fi
 done
 
 echo "convert new images..."
-cat $TMPFILE | parallel -j $CORES 'echo {}...; convert -resize ${LQ_WIDTH}x${LQ_HEIGHT}\> -quality $LQ_QUALITY {} lq_{}' && 
-touch .lastrun
+cat $TMPFOLDER/new_images.txt | parallel -j $CORES "echo {}...; convert -resize ${LQ_WIDTH}x${LQ_HEIGHT}\> -quality $LQ_QUALITY {} lq_{}"
 
 echo "sync lq_final..." &&
 rsync -arz --progress lq_final $SSH_DEST &&
@@ -26,7 +27,7 @@ echo "sync lq_raw..." &&
 rsync -arz --progress lq_raw $SSH_DEST &&
 echo "sync final..." &&
 rsync -arz --progress final $SSH_DEST &&
-echo "sync raw (without .CR2's)..." &&
+echo "sync raw \(without .CR2s\)..." &&
 rsync -arz --progress --exclude '*.CR2' raw $SSH_DEST &&
 echo "sync raw..." &&
 rsync -arz --progress raw $SSH_DEST &&
