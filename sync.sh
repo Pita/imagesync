@@ -26,6 +26,8 @@ echo "sync lq_raw..." &&
 rsync -arz --progress lq_raw $SSH_DEST &&
 echo "sync final..." &&
 rsync -arz --progress final $SSH_DEST &&
+echo "sync raw (without .CR2's)..." &&
+rsync -arz --progress --exclude '*.CR2' raw $SSH_DEST &&
 echo "sync raw..." &&
 rsync -arz --progress raw $SSH_DEST &&
 echo "sync edit..." &&
